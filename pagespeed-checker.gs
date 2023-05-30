@@ -17,7 +17,6 @@ function pagespeedChecker(){
   if(ultimaLinhaURLs === 0){
     var ultimaLinhaURLs = 1;
   }
-  var dataURLs = planilha.getRange(ultimaLinhaURLs, 1).getValue();
   //
   var colunaPagespeed = planilha.getRange("B:B").getValues();
   var ultimaLinhaPagespeed = colunaPagespeed.filter(String).length;
@@ -29,16 +28,16 @@ function pagespeedChecker(){
   // Compara as da verificação do sitemap com a data atual
   if (!(dataSitemap instanceof Date && dataSitemap.toDateString() === dataAtual.toDateString())) {
     //Se ainda não foi feita a atualização do sitemap hoje, encerra o script
-    Logger.log("A planilha '"+nomeSitemapPlanilha+"' ainda não foi atualizada hoje.");
+    // Logger.log("A planilha '"+nomeSitemapPlanilha+"' ainda não foi atualizada hoje.");
     return
   }else if ( dataPagespeed instanceof Date && dataPagespeed.toDateString() === dataAtual.toDateString() ) {
     //Se a atualização da planilha do PageSpeed já foi feita hoje, encerra o script
-    Logger.log("A atualização da planilha '"+nomePlanilha+"' foi concluída hoje.");
+    // Logger.log("A atualização da planilha '"+nomePlanilha+"' foi concluída hoje.");
     return
   }else if(ultimaLinhaURLs === ultimaLinhaPagespeed || ultimaLinhaURLs === 1){
-    Logger.log("Limpando todos os dados de '"+nomePlanilha+"' antes da nova importação.");
+    // Logger.log("Limpando todos os dados de '"+nomePlanilha+"' antes da nova importação.");
     planilha.clearContents();
-    Logger.log("Importando os dados de '"+nomeSitemapPlanilha+"' para '"+nomePlanilha+"'.");
+    // Logger.log("Importando os dados de '"+nomeSitemapPlanilha+"' para '"+nomePlanilha+"'.");
     var valoresColunaA = sitemapPlanilha.getRange("A:A").getValues();
     for (var i = 0; i < valoresColunaA.length; i++) {
       var celula = valoresColunaA[i][0];
@@ -48,11 +47,11 @@ function pagespeedChecker(){
       }
     }
     planilha.getRange(1, 1, valoresColunaA.length, 1).setValues(valoresColunaA);
-    Logger.log("Importação de '"+nomeSitemapPlanilha+"' para '"+nomePlanilha+"' finalizada.");
+    // Logger.log("Importação de '"+nomeSitemapPlanilha+"' para '"+nomePlanilha+"' finalizada.");
     writeMetrics(planilha);
     sumarioPagespeed();
   }else if(ultimaLinhaURLs !== ultimaLinhaPagespeed){
-    Logger.log("Iniciando o processo de conexão com o PageSpeed Insights.")
+    // Logger.log("Iniciando o processo de conexão com o PageSpeed Insights.")
     writeMetrics(planilha);
     sumarioPagespeed();
   }
@@ -65,7 +64,7 @@ function writeMetrics(planilha) {
   var ultimaLinhaB = colunaB.filter(String).length;
   if(ultimaLinhaB===0){
     //Escreve os cabeçalhos na planilha
-    Logger.log("Escrevendo os cabeçalhos em '"+nomePlanilha+"'.");
+    // Logger.log("Escrevendo os cabeçalhos em '"+nomePlanilha+"'.");
     planilha.getRange('B1').setValue('Score');
     planilha.getRange('C1').setValue('Largest Contentful Paint');
     planilha.getRange('D1').setValue('Cumulative Layout Shift');
@@ -77,9 +76,9 @@ function writeMetrics(planilha) {
     var linhaInicial = ultimaLinhaB+1;
   }
   var urls = planilha.getRange("A"+linhaInicial+":A" + ultimaLinhaA).getValues();
-  Logger.log("Iniciando captura de métricas das URLs");
-  Logger.log("Começando na linha: "+linhaInicial);
-  Logger.log("Total de urls: "+urls.length);
+  // Logger.log("Iniciando captura de métricas das URLs");
+  // Logger.log("Começando na linha: "+linhaInicial);
+  // Logger.log("Total de urls: "+urls.length);
   for (var i = 0; i < urls.length; i++) {
     var linhaAtual = linhaInicial+i;
     var url = urls[i][0];
@@ -91,11 +90,11 @@ function writeMetrics(planilha) {
   planilha.getRange(ultimaLinhaA+1,2).setValue(dataAtual); //escreve a data na primeira linha depois do último status
   //Faz o backup das informação eu uma outra planilha
   registroDePagespeed();
-  Logger.log("Todos as métricas foram escritos na planilha.");
+  // Logger.log("Todos as métricas foram escritos na planilha.");
 }
 
 function psConect(url,linha) {
-  Logger.log("Iniciando o processo de escrita ds métricas para a url "+url+ " na planilha "+nomePlanilha+" na linha "+linha);
+  // Logger.log("Iniciando o processo de escrita ds métricas para a url "+url+ " na planilha "+nomePlanilha+" na linha "+linha);
   var apiKey = "AIzaSyAsxXOKXK75NzmnWXosnHij2UsOoXbPCQY";
   var pageSpeedEndpointUrl = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=" + encodeURIComponent(url) + "&key=" + apiKey + "&strategy=mobile";
   var response = UrlFetchApp.fetch(pageSpeedEndpointUrl);
@@ -124,8 +123,8 @@ function psConect(url,linha) {
     'totalBlockingTime': totalBlockingTime,
     'speedIndex': speedIndex,
   }
-  Logger.log(JSON.stringify(result, null, 2));
-  Logger.log("As métricas para a url "+url+ "foram escritas na planilha "+nomePlanilha);
+  // Logger.log(JSON.stringify(result, null, 2));
+  // Logger.log("As métricas para a url "+url+ "foram escritas na planilha "+nomePlanilha);
 }
 
 function sumarioPagespeed() {
@@ -186,26 +185,26 @@ function sumarioPagespeed() {
     if(url === "https://www.oiplace.com.br/") {
       totalHome++;
       scoreHome += score;
-      Logger.log("Home | "+url);
+      // Logger.log("Home | "+url);
 
     } else if (url.endsWith(".html")) {
       if (diretorios === 1) {
         totalLp++;
         scoreLp += score;
-        Logger.log("LP | "+url);
+        // Logger.log("LP | "+url);
       }else if (diretorios === 2) {
         totalProd++;
         scoreProd += score;
-        Logger.log("Prod | "+url);
+        // Logger.log("Prod | "+url);
       }
     } else if (url.indexOf("/perguntas-frequentes/") !== -1 || url.indexOf("/minha-conta/") !== -1 ) {
       totalLp++;
       scoreLp += score;
-      Logger.log("LP | "+url);
+      // Logger.log("LP | "+url);
     }else{
       totalCat++;
       scoreCat += score;
-      Logger.log("Cat | "+url);
+      // Logger.log("Cat | "+url);
     }
   }
 
@@ -215,7 +214,7 @@ function sumarioPagespeed() {
   mensagem += '<b>Score médio das páginas de categoria:</b> '+(scoreCat/totalCat).toFixed(0)+'\n';
   mensagem += '<b>Score médio das landing pages:</b> '+(scoreLp/totalLp).toFixed(0)+'\n';
   mensagem += '\nDados salvos na planilha <b>Registro de PageSpeed</b> em ' + dataChecker+' às '+horaChecker;
-  Logger.log(mensagem);
+  // Logger.log(mensagem);
   // Enviar mensagem pelo Telegram
   alertaPagespeedTelegram(mensagem);
 }
@@ -237,7 +236,7 @@ function alertaPagespeedTelegram(mensagem) {
     "payload": JSON.stringify(payload)
   };
   UrlFetchApp.fetch(url, options);
-  Logger.log("Dados de checagem enviados no Telegram.");
+  // Logger.log("Dados de checagem enviados no Telegram.");
 }
 
 function registroDePagespeed() {
