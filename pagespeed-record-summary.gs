@@ -41,6 +41,7 @@ function criarSumario() {
   getMediumScore("E");
   getMediumScore("F");
   getMediumScore("G");
+  getRouteMediumScore("B");
     
 }
 
@@ -82,9 +83,6 @@ function getMediumScore(colunaAlvo) {
       // Obtém os valores da coluna D da planilha correspondente à data
      
       var valoresColuna = planilha.getRange(colunaAlvo+":"+colunaAlvo).getValues();
-
-      var ultimaLinhaAlvo = (valoresColuna.filter(String).length)-1;
-      var valoresColunaAlvo = planilha.getRange(colunaAlvo+":"+colunaAlvo+ultimaLinhaAlvo).getValues();
     
       // Conta todas os valores da coluna alvo
       var total = -1; //começando negativo para descontar a primeira linha que é um cabeçalho    
@@ -106,6 +104,98 @@ function getMediumScore(colunaAlvo) {
       }else{
         sumario.getRange(colunaAlvo+linha).setValue(scoreMedio);
       }
+      
+    }
+  }
+}
+
+function getRouteMediumScore(colunaAlvo) {
+
+  var arquivo = SpreadsheetApp.getActiveSpreadsheet();
+  var sumario = arquivo.getSheetByName("Sumário");
+  var dataRange = sumario.getRange("A2:A" + sumario.getLastRow());
+  var datas = dataRange.getValues();
+  
+  // Limpa os dados existentes nas colunas B e C da planilha "Sumário"
+  sumario.getRange("H:K").clearContent();
+  
+  // Escreve os índices das colunas em B1 e C1, respectivamente
+  sumario.getRange("H1").setValue("Score Médio Home");
+  sumario.getRange("I1").setValue("Score Médio Produtos");
+  sumario.getRange("J1").setValue("Score Médio Categorias");
+  sumario.getRange("K1").setValue("Score Médio Landing Pages");
+  
+  // Itera sobre as datas na coluna A do "Sumário"
+  for (var i = 0; i < datas.length; i++) {
+    var data = Utilities.formatDate(datas[i][0], Session.getScriptTimeZone(), "dd-MM-yyyy");
+    var planilha = arquivo.getSheetByName(data);
+    
+    if (planilha) {
+      // Obtém os valores da coluna D da planilha correspondente à data
+     
+      var valoresColuna = planilha.getRange(colunaAlvo+":"+colunaAlvo).getValues();
+      var valoresURLs = planilha.getRange("A"+":"+"A").getValues();
+    
+      var totalHome = 0; //começando negativo para descontar a primeira linha que é um cabeçalho    
+      var somaHome = 0;
+
+      var totalProd = 0; //começando negativo para descontar a primeira linha que é um cabeçalho    
+      var somaProd = 0;
+
+      var totalCat = 0; //começando negativo para descontar a primeira linha que é um cabeçalho    
+      var somaCat = 0;
+
+      var totalLp = 0; //começando negativo para descontar a primeira linha que é um cabeçalho    
+      var somaLp = 0;
+
+      for (var j = 0; j < valoresColuna.length; j++) {
+        var valor = valoresColuna[j][0];
+        var url = valoresURLs[j][0];
+
+        if (j > 0 && valor !== "" && !(valor instanceof Date) ) {
+          if(url.endsWith('/')){
+            var indexUltimaBarra = url.lastIndexOf('/');
+            var urlFinal = url.substring(0, indexUltimaBarra);
+          }else{
+            var urlFinal = url;
+          }
+          var numeroBarras = (urlFinal.match(/\//g) || []).length;
+          var diretorios = numeroBarras-2;
+          if(url === "https://www.oiplace.com.br/") {
+            totalHome++;
+            somaHome += valor;
+          } else if (url.endsWith(".html")) {
+            if (diretorios === 1) {
+              totalLp++;
+              somaLp += valor;
+            }else if (diretorios === 2) {
+              totalProd++;
+              somaProd += valor;
+            }
+          } else if (url.indexOf("/perguntas-frequentes/") !== -1 || url.indexOf("/minha-conta/") !== -1 ) {
+            totalLp++;
+            somaLp += valor;
+          }else{
+            totalCat++;
+            somaCat += valor;
+          }
+        }
+      }
+      
+      // Escreve o score médio referente a data
+      var linha = i + 2;
+      
+      var scoreHome = somaHome/totalHome;
+      sumario.getRange("H"+linha).setValue(Math.round(scoreHome));
+
+      var scoreProd = somaProd/totalProd;
+      sumario.getRange("I"+linha).setValue(Math.round(scoreProd));
+
+      var scoreCat = somaCat/totalCat;
+      sumario.getRange("J"+linha).setValue(Math.round(scoreCat));
+
+      var scoreLp = somaLp/totalLp;
+      sumario.getRange("K"+linha).setValue(Math.round(scoreLp));
       
     }
   }
