@@ -32,16 +32,16 @@ function coverageChecker(){
   // Compara as da verificação do sitemap com a data atual
   if (!(dataSitemap instanceof Date && dataSitemap.toDateString() === dataAtual.toDateString())) {
     //Se ainda não foi feita a atualização do sitemap hoje, encerra o script
-    Logger.log("A planilha '"+nomeSitemapPlanilha+"' ainda não foi atualizada hoje.");
+    // Logger.log("A planilha '"+nomeSitemapPlanilha+"' ainda não foi atualizada hoje.");
     return
   }else if ( dataCoverage instanceof Date && dataCoverage.toDateString() === dataAtual.toDateString() ) {
     //Se a atualização da planilha de Cobertura já foi feita hoje, encerra o script
-    Logger.log("A atualização da planilha '"+nomePlanilha+"' foi concluída hoje.");
+    // Logger.log("A atualização da planilha '"+nomePlanilha+"' foi concluída hoje.");
     return
   }else if(ultimaLinhaURLs === ultimaLinhaCoverage || ultimaLinhaURLs === 1){
-    Logger.log("Limpando todos os dados de '"+nomePlanilha+"' antes da nova importação.");
+    // Logger.log("Limpando todos os dados de '"+nomePlanilha+"' antes da nova importação.");
     planilha.clearContents();
-    Logger.log("Importando os dados de '"+nomeSitemapPlanilha+"' para '"+nomePlanilha+"'.");
+    // Logger.log("Importando os dados de '"+nomeSitemapPlanilha+"' para '"+nomePlanilha+"'.");
     var valoresColunaA = sitemapPlanilha.getRange("A:A").getValues();
     for (var i = 0; i < valoresColunaA.length; i++) {
       var celula = valoresColunaA[i][0];
@@ -51,9 +51,9 @@ function coverageChecker(){
       }
     }
     planilha.getRange(1, 1, valoresColunaA.length, 1).setValues(valoresColunaA);
-    Logger.log("Importação de '"+nomeSitemapPlanilha+"' para '"+nomePlanilha+"' finalizada.");
+    // Logger.log("Importação de '"+nomeSitemapPlanilha+"' para '"+nomePlanilha+"' finalizada.");
     //Escreve os cabeçalhos na planilha
-    Logger.log("Escrevendo os cabeçalhos em '"+nomePlanilha+"'.");
+    // Logger.log("Escrevendo os cabeçalhos em '"+nomePlanilha+"'.");
     planilha.getRange('B1').setValue('coverageState');
     planilha.getRange('C1').setValue('pageFetchState');
     planilha.getRange('D1').setValue('verdict');
@@ -64,7 +64,7 @@ function coverageChecker(){
     //Verifica se estamos no horário determinado e, se sim, envia mensagem com o status atual no Telegram
     var horaAtual = dataAtual.getHours();
     if(planilha.getRange('B1').getValue() !== "coverage" && horaAtual >= 15 && horaAtual < 16 ) {
-      Logger.log("Trocando o cabeçalho da coluna B.");
+      // Logger.log("Trocando o cabeçalho da coluna B.");
       planilha.getRange('B1').setValue('coverage');
       //Cria a mensagem para ser enviada para o Telegram
       sumarioCobertura("parcial","D");
@@ -80,7 +80,7 @@ function coverageChecker(){
 }
 
 function gscConect(){
-  Logger.log("Conectando com a API do GSC.");
+  // Logger.log("Conectando com a API do GSC.");
   var colunaA = planilha.getRange("A:A").getValues();
   var ultimaLinhaA = (colunaA.filter(String).length)-1;
   if(ultimaLinhaA === 0){
@@ -98,13 +98,13 @@ function gscConect(){
     var linhaInicial = ultimaLinhaB+1;
   }
   //Inicia o processo de conexão com o GSC
-  Logger.log("Linha inicial:"+linhaInicial);
-  Logger.log("Linha final:"+ultimaLinhaA);
+  // Logger.log("Linha inicial:"+linhaInicial);
+  // Logger.log("Linha final:"+ultimaLinhaA);
   var urls = planilha.getRange("A"+linhaInicial+":A"+ultimaLinhaA).getValues();
   var valoresURLs = urls.map(function(row) {
     return row[0]; // Extrai os valores da primeira coluna (coluna A)
   });
-  Logger.log("Escrevendo os dados do GSC na planilha '"+nomePlanilha+"'.");
+  // Logger.log("Escrevendo os dados do GSC na planilha '"+nomePlanilha+"'.");
   for (var i = 0; i < valoresURLs.length; i++) {
     var url = urls[i].toString();
     try {
@@ -146,7 +146,7 @@ function gscConect(){
 }
 
 function gscWriteInspect(writeLine,url,json){
-  Logger.log("Escrevendo a linha referente a '"+url+"'.");
+  // Logger.log("Escrevendo a linha referente a '"+url+"'.");
   var coverageState = json.inspectionResult.indexStatusResult.coverageState;
   var pageFetchState = json.inspectionResult.indexStatusResult.pageFetchState;
   var pageFetchState;
@@ -217,7 +217,7 @@ function gscWriteInspect(writeLine,url,json){
   }
   var googleCanonical = json.inspectionResult.indexStatusResult.googleCanonical;
   var lastCrawlTime = json.inspectionResult.indexStatusResult.lastCrawlTime;
-  Logger.log("Escrevendo na linha'"+writeLine+"'.");
+  // Logger.log("Escrevendo na linha'"+writeLine+"'.");
   planilha.getRange('B' + (writeLine)).setValue(coverageState);
   planilha.getRange('C' + (writeLine)).setValue(pageFetchState);
   if(verdict !== ""){
@@ -274,7 +274,7 @@ function sumarioCobertura(status,letraAlvo) {
   });
   mensagem += '\n<b>Checagem realizada em ' + dataChecker+' às '+horaChecker+'</b>';
   // Enviar mensagem pelo Telegram
-  //Logger.log(mensagem);
+  Logger.log(mensagem);
   alertaCoverageTelegram(mensagem);
 }
 
@@ -295,7 +295,7 @@ function alertaCoverageTelegram(mensagem) {
     "payload": JSON.stringify(payload)
   };
   UrlFetchApp.fetch(url, options);
-  Logger.log("Dados de checagem enviados no Telegram.");
+  // Logger.log("Dados de checagem enviados no Telegram.");
 }
 
 function registroDeCobertura() {
