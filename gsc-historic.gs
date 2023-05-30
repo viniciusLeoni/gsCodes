@@ -17,8 +17,8 @@ function getDataFromGSC() {
   }
   var today = new Date();
   endDate = today.toISOString().slice(0, 10);
-  Logger.log(startDate);
-  Logger.log(endDate);
+  //Logger.log(startDate);
+  //Logger.log(endDate);
   var searchConsoleAPIEndpoint = "https://www.googleapis.com/webmasters/v3/sites/" + propertyId + "/searchAnalytics/query";
   var headers = {
     "Authorization": "Bearer " + ScriptApp.getOAuthToken()
@@ -168,5 +168,5 @@ function enviarGSCTelegram(mensagem) {
     "payload": JSON.stringify(payload)
   };
   UrlFetchApp.fetch(url, options);
-  Logger.log("Dados de checagem enviados no Telegram.");
+  //Logger.log("Dados de checagem enviados no Telegram.");
 }
