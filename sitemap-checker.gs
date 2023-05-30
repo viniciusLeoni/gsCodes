@@ -8,7 +8,7 @@ function sitemapChecker() {
   //Checa se a planilha existe
   if (!planilha) {
     // Verifica se a planilha foi encontrada
-    Logger.log("A planilha com o nome '" + nomePlanilha + "' não foi encontrada.");
+    // Logger.log("A planilha com o nome '" + nomePlanilha + "' não foi encontrada.");
     return;
   }
   //Checa se a planilha já foi completamente preenchida hoje
@@ -18,7 +18,7 @@ function sitemapChecker() {
     var valorUltimaCelulaA = planilha.getRange(ultimaLinha, 1).getValue();
     var valorUltimaCelulaB = planilha.getRange(ultimaLinha, 2).getValue();
     if (valorUltimaCelulaA instanceof Date && valorUltimaCelulaA.toDateString() === dataAtual.toDateString() && valorUltimaCelulaB instanceof Date && valorUltimaCelulaB.toDateString() === dataAtual.toDateString()) {
-      Logger.log("A planilha com o nome '" + nomePlanilha + "' já foi preenchida hoje.");
+      // Logger.log("A planilha com o nome '" + nomePlanilha + "' já foi preenchida hoje.");
       var cellB1 = planilha.getRange(1,2).getValue();
       if(cellB1 !== "Códigos"){
         planilha.getRange(1,2).setValue("Códigos")
@@ -37,14 +37,14 @@ function sitemapChecker() {
     if (!(valorUltimaCelulaA instanceof Date && valorUltimaCelulaA.toDateString() === dataAtual.toDateString())) {
       // Limpa os dados existentes na planilha
       planilha.clearContents();
-      Logger.log("Planilha foi completamente limpa. Iniciando os trabalhos.");
+      // Logger.log("Planilha foi completamente limpa. Iniciando os trabalhos.");
       //Insere os dados na planilha
       importarXML(sitemap_url,planilha,root,xml);
     }
     //Escreve os status das urls na coluna B
     escreverStatusURLs(planilha);
   }else{
-    Logger.log("Falha ao obter o sitemap. Status code: " + response.getResponseCode());
+    // Logger.log("Falha ao obter o sitemap. Status code: " + response.getResponseCode());
   }
 }
 
@@ -53,18 +53,18 @@ function importarXML(sitemap_url,planilha,root,xml) {
   var locs = []; // Array para armazenar os valores de loc
   if (xml.indexOf("<sitemap>") !== -1) { 
     var sitemaps = root.getChildren("sitemap", ns); // Obtém todos os elementos filho "url" do elemento raiz, usando o namespace
-    Logger.log("Iniciando sitemap índice - "+sitemap_url);
+    // Logger.log("Iniciando sitemap índice - "+sitemap_url);
     // Loop para percorrer os elementos url e obter os valores de loc
     for (var j = 0; j < sitemaps.length; j++) {
       var urlElementSitemap = sitemaps[j]; // Obtém o elemento url atual
       var locElementSitemap = urlElementSitemap.getChild("loc", ns); // Obtém o elemento loc dentro do elemento url, usando o namespace
       var locValueSitemap = locElementSitemap.getValue(); // Obtém o valor de texto do elemento loc
-      Logger.log("Iniciando o sitemap único - "+locValueSitemap);
+      // Logger.log("Iniciando o sitemap único - "+locValueSitemap);
       var xmlFilho = UrlFetchApp.fetch(locValueSitemap).getContentText(); // Faz a solicitação do URL e obtém o conteúdo em formato de texto
       var documentFilho = XmlService.parse(xmlFilho); // Analisa o XML obtido em um objeto Document
       var rootFilho = documentFilho.getRootElement(); // Obtém o elemento raiz do XML
       var urls = rootFilho.getChildren("url", ns); // Obtém todos os elementos filho "url" do elemento raiz, usando o namespace
-      Logger.log(urls.length);
+      // Logger.log(urls.length);
       // Loop para percorrer os elementos url e obter os valores de loc
       for (var i = 0; i < urls.length; i++) {
         var urlElement = urls[i]; // Obtém o elemento url atual
@@ -73,14 +73,14 @@ function importarXML(sitemap_url,planilha,root,xml) {
         if (locValue.toString().indexOf("smplaces.") != -1) {
           locValue = locValue.toString().replace("smplaces.", "www.");
         }
-        Logger.log(locValue);
+        // Logger.log(locValue);
         locs.push([locValue]); // Adiciona o valor de loc ao array locs
       }
-      Logger.log("Finalizando o sitemap único - "+locValueSitemap);
+      // Logger.log("Finalizando o sitemap único - "+locValueSitemap);
     }
-    Logger.log("Finalizando sitemap índice - "+sitemap_url);
+    // Logger.log("Finalizando sitemap índice - "+sitemap_url);
   }else{
-    Logger.log("Iniciando sitemap único - "+sitemap_url);
+    // Logger.log("Iniciando sitemap único - "+sitemap_url);
     var urls = root.getChildren("url", ns); // Obtém todos os elementos filho "url" do elemento raiz, usando o namespace
     // Loop para percorrer os elementos url e obter os valores de loc
     for (var i = 0; i < urls.length; i++) {
@@ -90,10 +90,10 @@ function importarXML(sitemap_url,planilha,root,xml) {
       if (locValue.toString().indexOf("smplaces.") != -1) {
         locValue = locValue.toString().replace("smplaces.", "www.");
       }
-      Logger.log(locValue);
+      // Logger.log(locValue);
       locs.push([locValue]); // Adiciona o valor de loc ao array locs
     }
-    Logger.log("Finalizando sitemap único - "+sitemap_url);
+    // Logger.log("Finalizando sitemap único - "+sitemap_url);
   }
   planilha.getRange(1,1).setValue("URLs");
   planilha.getRange(2, 1, locs.length, locs[0].length).setValues(locs);
@@ -113,9 +113,9 @@ function escreverStatusURLs(planilha) {
     var linhaInicial = ultimaLinhaB+1;
   }
   var urls = planilha.getRange("A"+linhaInicial+":A" + ultimaLinhaA).getValues();
-  Logger.log("Iniciando captura de status code das URLs");
-  Logger.log("Começando na linha: "+linhaInicial);
-  Logger.log("Total de urls: "+urls.length);
+  // Logger.log("Iniciando captura de status code das URLs");
+  // Logger.log("Começando na linha: "+linhaInicial);
+  // Logger.log("Total de urls: "+urls.length);
   for (var i = 0; i < urls.length; i++) {
     var url = urls[i][0];
     var options = {
@@ -128,13 +128,13 @@ function escreverStatusURLs(planilha) {
     planilha.getRange(linhaInicial+i, 2).setNumberFormat('@')
     planilha.getRange(linhaInicial+i, 2).setValue(headerStatus);
     planilha.getRange(linhaInicial+i, 2).setNumberFormat('0')
-    Logger.log(url+" - "+headerStatus);
+    // Logger.log(url+" - "+headerStatus);
   }
   var dataAtual = new Date();
   planilha.getRange(ultimaLinhaA+1,2).setValue(dataAtual); //escreve a data na primeira linha depois do último status
   //Faz o backup das informação eu uma outra planilha
   registroDeSitemap();
-  Logger.log("Todos os status code das URLs foram escritos na planilha.");
+  // Logger.log("Todos os status code das URLs foram escritos na planilha.");
 }
 
 function sumarioSitemap(planilha) {
@@ -196,7 +196,7 @@ function alertaSitemapTelegram(mensagem) {
     "payload": JSON.stringify(payload)
   };
   UrlFetchApp.fetch(url, options);
-  Logger.log("Dados de checagem enviados no Telegram.");
+  // Logger.log("Dados de checagem enviados no Telegram.");
 }
 
 function registroDeSitemap() {
