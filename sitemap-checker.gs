@@ -1,3 +1,4 @@
+//Crie uma planilha no Google Planilhas e nomeie a "Página 1" como "Sitemap"
 function sitemapChecker() {
   //EDITAR
   var sitemap_url = "https://www.oiplace.com.br/sitemap_index.xml"; // Insira a URL do arquivo XML que você deseja importar
